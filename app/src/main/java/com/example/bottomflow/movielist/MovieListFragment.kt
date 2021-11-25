@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -20,6 +19,7 @@ import com.example.bottomflow.utility.Utils.triggerSnackBar
 import com.example.bottomflow.utility.interfaces.OnItemClick
 import com.example.bottomflow.utility.model.TMDBMovie
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import java.util.*
 
 class MovieListFragment : Fragment(), OnItemClick {
@@ -48,26 +48,22 @@ class MovieListFragment : Fragment(), OnItemClick {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initRV()
-        binding.btnRefresh.setOnClickListener {
-            viewModel.fetchMovies()
-        }
+        initSwipeRefreshLayout()
+        initRecyclerView()
         lifecycleScope.launchWhenStarted {
             viewModel.movieList.collect {
                 when (it) {
                     is UiState.Error<*> -> {
                         Log.d(mTag, it.error.toString())
-                        binding.spinnerMovie.isVisible = false
+                        binding.srlMovieList.isRefreshing = false
                     }
-                    UiState.Loading -> {
-                        binding.spinnerMovie.isVisible = true
-                    }
+                    is UiState.Loading -> Unit
                     is UiState.Notify<*> -> {
                         triggerSnackBar(binding.root, it.message.toString())
                     }
                     is UiState.Success<*> -> {
                         Log.d(mTag, it.data.toString())
-                        binding.spinnerMovie.isVisible = false
+                        binding.srlMovieList.isRefreshing = false
                         movieListAdapter.updateMovies(it.data as ArrayList<TMDBMovie>)
                     }
                 }
@@ -86,11 +82,29 @@ class MovieListFragment : Fragment(), OnItemClick {
         loadFragment(fragmentManager, MovieDetailFragment.newInstance())
     }
 
-    private fun initRV() {
+    private fun initRecyclerView() {
+        lifecycleScope.launchWhenResumed {
+            viewModel.movieList.collectLatest {
+                when (it) {
+                    is UiState.Success<*> -> {
+                        movieList.addAll(it.data as ArrayList<TMDBMovie>)
+                    }
+                    else -> Unit
+                }
+            }
+
+        }
         binding.rvMovie.let {
             movieListAdapter = MovieListAdapter(movieList, this)
             it.adapter = movieListAdapter
             it.addItemDecoration(DividerItemDecoration(it.context, LinearLayoutManager.VERTICAL))
+        }
+    }
+
+    private fun initSwipeRefreshLayout() {
+        binding.srlMovieList.isRefreshing = true
+        binding.srlMovieList.setOnRefreshListener {
+            viewModel.fetchMovies()
         }
     }
 }

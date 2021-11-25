@@ -15,7 +15,6 @@ class MovieListViewModel : ViewModel() {
 
     internal fun fetchMovies() {
         viewModelScope.launch {
-            _movieList.emit(UiState.Loading)
             try {
                 val response = movieDataSource.getTMDBPage()
                 if (response.isSuccessful) {
