@@ -17,9 +17,9 @@ class MovieListViewModel : ViewModel() {
         viewModelScope.launch {
             _movieList.emit(UiState.Loading)
             try {
-                val response = movieDataSource.getAllMovies()
+                val response = movieDataSource.getTMDBPage()
                 if (response.isSuccessful) {
-                    _movieList.emit(UiState.Success(response.body()))
+                    _movieList.emit(UiState.Success(response.body()?.results))
                 } else {
                     _movieList.emit(UiState.Error(response.message()))
                     _movieList.emit(UiState.Notify("Network error"))

@@ -1,14 +1,12 @@
 package com.example.bottomflow.datasource
 
-import com.example.bottomflow.utility.Movie
 import com.example.bottomflow.utility.interfaces.RetrofitService
+import com.example.bottomflow.utility.model.TMDBPage
 import retrofit2.Response
 
 class MovieDataSource {
 
-    suspend fun getAllMovies(): Response<ArrayList<Movie>> {
-        return RetrofitService.getInstance().getAllMovies().apply {
-            this.body()?.shuffle()
-        }
+    suspend fun getTMDBPage(): Response<TMDBPage> {
+        return RetrofitService.getInstance().getTMDBPage()
     }
 }

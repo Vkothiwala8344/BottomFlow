@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.bumptech.glide.Glide
 import com.example.bottomflow.R
+import com.example.bottomflow.utility.interfaces.RetrofitService.Companion.TMDB_IMAGE_BASE_URL
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
@@ -77,7 +78,7 @@ object Utils {
 
     fun loadImageFromServer(view: ImageView, url: String) {
         Glide.with(view.context)
-            .load(url)
+            .load(TMDB_IMAGE_BASE_URL + url)
             .into(view)
     }
 }
@@ -88,11 +89,4 @@ data class BottomSheetData(
     val subtitle: Int,
     val showAccept: Boolean = false,
     val showDecline: Boolean = false
-) : Parcelable
-
-@Parcelize
-data class Movie(
-    val name: String,
-    val imageUrl: String,
-    val category: String
 ) : Parcelable

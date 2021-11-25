@@ -14,12 +14,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bottomflow.adapters.MovieListAdapter
 import com.example.bottomflow.databinding.MovieListFragmentBinding
 import com.example.bottomflow.moviedetail.MovieDetailFragment
-import com.example.bottomflow.utility.Movie
 import com.example.bottomflow.utility.UiState
 import com.example.bottomflow.utility.Utils.loadFragment
 import com.example.bottomflow.utility.Utils.triggerSnackBar
 import com.example.bottomflow.utility.interfaces.OnItemClick
+import com.example.bottomflow.utility.model.TMDBMovie
 import kotlinx.coroutines.flow.collect
+import java.util.*
 
 class MovieListFragment : Fragment(), OnItemClick {
 
@@ -33,7 +34,7 @@ class MovieListFragment : Fragment(), OnItemClick {
     private lateinit var viewModel: MovieListViewModel
     private var _binding: MovieListFragmentBinding? = null
     private val binding get() = _binding!!
-    private val movieList = ArrayList<Movie>()
+    private val movieList = ArrayList<TMDBMovie>()
     private lateinit var movieListAdapter: MovieListAdapter
 
     override fun onCreateView(
@@ -67,7 +68,7 @@ class MovieListFragment : Fragment(), OnItemClick {
                     is UiState.Success<*> -> {
                         Log.d(mTag, it.data.toString())
                         binding.spinnerMovie.isVisible = false
-                        movieListAdapter.updateMovies(it.data as ArrayList<Movie>)
+                        movieListAdapter.updateMovies(it.data as ArrayList<TMDBMovie>)
                     }
                 }
             }
@@ -79,7 +80,7 @@ class MovieListFragment : Fragment(), OnItemClick {
         // Use the Kotlin extension in the fragment-ktx artifact
         val fragmentManager = activity?.supportFragmentManager
         val bundle = Bundle().apply {
-            this.putParcelable(MOVIE_BUNDLE_KEY, item as Movie)
+            this.putParcelable(MOVIE_BUNDLE_KEY, item as TMDBMovie)
         }
         fragmentManager?.setFragmentResult(MOVIE_REQUEST_KEY, bundle)
         loadFragment(fragmentManager, MovieDetailFragment.newInstance())
