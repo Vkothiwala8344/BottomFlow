@@ -16,6 +16,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDE
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.parcelize.Parcelize
+import java.util.*
 
 object Utils {
 
@@ -81,6 +82,10 @@ object Utils {
             .load(TMDB_IMAGE_BASE_URL + url)
             .into(view)
     }
+
+    fun getRandomPageType() =
+        PageType.values()[Random().nextInt(PageType.values().size)]
+
 }
 
 @Parcelize
@@ -90,3 +95,10 @@ data class BottomSheetData(
     val showAccept: Boolean = false,
     val showDecline: Boolean = false
 ) : Parcelable
+
+@Parcelize
+enum class PageType(val id: Int) : Parcelable {
+    TOP_RATED(R.string.top_rated_movie_list),
+    POPULAR(R.string.popular_movie_list),
+    NOW_PLAYING(R.string.now_playing_movie_list)
+}

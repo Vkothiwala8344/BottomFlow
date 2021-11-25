@@ -12,7 +12,10 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bottomflow.adapters.MovieListAdapter
 import com.example.bottomflow.databinding.MovieListFragmentBinding
+import com.example.bottomflow.home.HomeFragment.Companion.MOVIE_TYPE_BUNDLE_KEY
+import com.example.bottomflow.home.HomeFragment.Companion.MOVIE_TYPE_REQUEST_KEY
 import com.example.bottomflow.moviedetail.MovieDetailFragment
+import com.example.bottomflow.utility.PageType
 import com.example.bottomflow.utility.UiState
 import com.example.bottomflow.utility.Utils.loadFragment
 import com.example.bottomflow.utility.Utils.triggerSnackBar
@@ -42,6 +45,18 @@ class MovieListFragment : Fragment(), OnItemClick {
         savedInstanceState: Bundle?
     ): View {
         viewModel = ViewModelProvider(this)[MovieListViewModel::class.java]
+
+        // Use the Kotlin extension in the fragment-ktx artifact
+        val fragmentManager = activity?.supportFragmentManager
+        fragmentManager?.setFragmentResultListener(
+            MOVIE_TYPE_REQUEST_KEY,
+            viewLifecycleOwner
+        ) { _, bundle ->
+            val pageType: PageType? = bundle.getParcelable(MOVIE_TYPE_BUNDLE_KEY)
+            if (pageType != null) {
+                viewModel.savePageType(pageType)
+            }
+        }
         _binding = MovieListFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -69,7 +84,12 @@ class MovieListFragment : Fragment(), OnItemClick {
                 }
             }
         }
-        viewModel.fetchMovies()
+        lifecycleScope.launchWhenResumed {
+            viewModel.pageType.collectLatest {
+                activity?.title = getString(it.id)
+                viewModel.fetchMovies(it)
+            }
+        }
     }
 
     override fun <T> onClick(item: T) {
@@ -98,13 +118,18 @@ class MovieListFragment : Fragment(), OnItemClick {
             movieListAdapter = MovieListAdapter(movieList, this)
             it.adapter = movieListAdapter
             it.addItemDecoration(DividerItemDecoration(it.context, LinearLayoutManager.VERTICAL))
+            //it.addItemDecoration(DividerItemDecoration(it.context, LinearLayoutManager.HORIZONTAL))
         }
     }
 
     private fun initSwipeRefreshLayout() {
         binding.srlMovieList.isRefreshing = true
         binding.srlMovieList.setOnRefreshListener {
-            viewModel.fetchMovies()
+            lifecycleScope.launchWhenStarted {
+                viewModel.pageType.collectLatest {
+                    viewModel.fetchMovies(it)
+                }
+            }
         }
     }
 }

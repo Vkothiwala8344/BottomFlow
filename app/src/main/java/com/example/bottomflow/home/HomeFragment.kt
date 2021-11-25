@@ -17,17 +17,20 @@ import com.example.bottomflow.adapters.ButtonListAdapter
 import com.example.bottomflow.databinding.HomeFragmentBinding
 import com.example.bottomflow.movielist.MovieListFragment
 import com.example.bottomflow.utility.BottomSheetData
-import com.example.bottomflow.utility.interfaces.OnItemClick
+import com.example.bottomflow.utility.PageType
 import com.example.bottomflow.utility.UiState
 import com.example.bottomflow.utility.Utils.loadFragment
 import com.example.bottomflow.utility.Utils.triggerSnackBar
 import com.example.bottomflow.utility.Utils.triggerTermsBottomSheet
+import com.example.bottomflow.utility.interfaces.OnItemClick
 import kotlinx.coroutines.flow.collect
 
 class HomeFragment : Fragment(), OnItemClick {
 
     companion object {
         fun newInstance() = HomeFragment()
+        const val MOVIE_TYPE_REQUEST_KEY = "movieTypeRequestKey"
+        const val MOVIE_TYPE_BUNDLE_KEY = "movieTypeBundleKey"
     }
 
     private var _binding: HomeFragmentBinding? = null
@@ -42,6 +45,7 @@ class HomeFragment : Fragment(), OnItemClick {
         savedInstanceState: Bundle?
     ): View {
         viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
+        activity?.title = getString(R.string.home)
         _binding = HomeFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -91,9 +95,9 @@ class HomeFragment : Fragment(), OnItemClick {
     override fun <T> onClick(item: T) {
         when (item) {
             getString(R.string.bottom_sheet) -> viewModel.fetch()
-            getString(R.string.retrofit) -> {
-                loadFragment(activity?.supportFragmentManager, MovieListFragment.newInstance())
-            }
+            getString(PageType.TOP_RATED.id) -> loadFragmentWithBundle(PageType.TOP_RATED)
+            getString(PageType.POPULAR.id) -> loadFragmentWithBundle(PageType.POPULAR)
+            getString(PageType.NOW_PLAYING.id) -> loadFragmentWithBundle(PageType.NOW_PLAYING)
             else -> triggerSnackBar(binding.root, "Click event can not be handled")
         }
     }
@@ -103,12 +107,23 @@ class HomeFragment : Fragment(), OnItemClick {
         items.addAll(
             listOf(
                 getString(R.string.bottom_sheet),
-                getString(R.string.retrofit)
+                getString(PageType.TOP_RATED.id),
+                getString(PageType.POPULAR.id),
+                getString(PageType.NOW_PLAYING.id)
             )
         )
         binding.rvButtons.let {
             it.adapter = ButtonListAdapter(items, this)
             it.addItemDecoration(DividerItemDecoration(it.context, LinearLayoutManager.VERTICAL))
         }
+    }
+
+    private fun loadFragmentWithBundle(pageType: PageType) {
+        val fragmentManager = activity?.supportFragmentManager?.apply {
+            val bundle = Bundle()
+            bundle.putParcelable(MOVIE_TYPE_BUNDLE_KEY, pageType)
+            this.setFragmentResult(MOVIE_TYPE_REQUEST_KEY, bundle)
+        }
+        loadFragment(fragmentManager, MovieListFragment.newInstance())
     }
 }

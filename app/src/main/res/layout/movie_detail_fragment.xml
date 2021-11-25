@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/yellow_cream">
+    android:background="@color/tmdb_background">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -17,11 +17,12 @@
             <ImageView
                 android:id="@+id/iv_movie"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:padding="2dp"
+                android:layout_height="0dp"
                 android:contentDescription="@string/movie_image"
+                android:padding="2dp"
                 android:scaleType="centerCrop"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.7"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:background="@drawable/ic_launcher_background" />

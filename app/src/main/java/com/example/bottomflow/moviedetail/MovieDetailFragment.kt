@@ -29,14 +29,13 @@ class MovieDetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         viewModel = ViewModelProvider(this)[MovieDetailViewModel::class.java]
+        activity?.title = getString(R.string.movie_detail)
         _binding = MovieDetailFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // Use the Kotlin extension in the fragment-ktx artifact
         val fragmentManager = activity?.supportFragmentManager
         fragmentManager?.setFragmentResultListener(
             MOVIE_REQUEST_KEY,
