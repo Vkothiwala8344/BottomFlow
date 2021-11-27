@@ -14,17 +14,20 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <include
+                android:id="@+id/movie_detail_toolbar"
+                layout="@layout/bottom_flow_toolbar" />
+
             <ImageView
                 android:id="@+id/iv_movie"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="400dp"
                 android:contentDescription="@string/movie_image"
                 android:padding="2dp"
                 android:scaleType="centerCrop"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.7"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/movie_detail_toolbar"
                 tools:background="@drawable/ic_launcher_background" />
 
             <TextView

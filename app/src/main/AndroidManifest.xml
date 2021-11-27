@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BottomFlow">
         <activity
-            android:name=".MainActivity"
+            android:name="com.example.bottomflow.views.home.HomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
